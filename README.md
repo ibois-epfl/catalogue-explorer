@@ -1,6 +1,8 @@
 # Catalogue Explorer
 A web application for viewing, filtering and downloading 3D representations (point cloud, mesh, minimum volume bounding box) and metadata of scanned objects.
 
+A demo of this web application is running at [https://ibois-epfl.github.io/catalogue-explorer/](https://ibois-epfl.github.io/catalogue-explorer/)
+
 ## Intro
 This web app comes with [Catalogue Exporter](https://github.com/ibois-epfl/catalogue-exporter), a plugin for the CAD software Rhinoceros which generate formatted data from point clouds. Formatted data is then handed to this web app for viewing, filtering and selective downloading.
 
