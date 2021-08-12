@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Object: 0cfd1fff-d432-43b6-b2d8-0d8af3bbb328</title>
+    <link rel="stylesheet" href="ui/css/styles.min.css">
+</head>
+
+<body>
+    
+    <div id="loaderGlyph"><span class="glyphicon glyphicon-refresh glyphicon-spin"></span></div>
+
+    <script id="data" src="data/0cfd1fff-d432-43b6-b2d8-0d8af3bbb328.js"></script>
+
+    <script src="app/iris.min.js"></script>
+
+    <script src="ui/js/ui.min.js" id="ui"></script>
+
+    <script>
+        window.onload = () => {
+            iris.ViewChange(iris.Views[1])
+            iris.ZoomExtents()
+            iris.ViewChange(iris.Views[3])
+            iris.OverrideMaterial("ghosted")
+            iris.OverrideMaterial("shaded")
+        }
+    </script>
+
+</body>
+</html>

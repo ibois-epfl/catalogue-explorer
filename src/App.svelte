@@ -4,16 +4,7 @@
   import {
     Header,
     HeaderUtilities,
-    HeaderAction,
     HeaderGlobalAction,
-    HeaderPanelLinks,
-    HeaderPanelDivider,
-    HeaderPanelLink,
-    SideNav,
-    SideNavItems,
-    SideNavMenu,
-    SideNavMenuItem,
-    SideNavLink,
     Content,
     Grid,
     Row,
@@ -29,15 +20,13 @@
   import * as d3 from "d3";
   import Breadcrumb from "./Breadcrumb.svelte";
 
-  let theme = "g80";
+  let theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "g90" : "g10";
+  console.log(window.matchMedia("(prefers-color-scheme: dark)"))
   function switchTheme() {
-    theme = theme == "g80" ? "g10" : "g80";
+    theme = theme == "g90" ? "g10" : "g90";
   }
 
-  let isSideNavOpen = true;
-  let isOpen = false;
-
-  let promDatabase = fetch("database.csv")
+  let promDatabase = fetch("data/database.csv")
     .then((r) => r.text())
     .then((d) => d3.csvParse(d))
     .then((d) =>
@@ -47,9 +36,14 @@
         .parentId((d) => d.parent)(d)
     );
 
-  let promDatabaseLeaves = promDatabase.then((d) =>
-    d.leaves().map((d) => d.data)
-  );
+  let promDatabaseLeaves = promDatabase.then((d) =>{
+    let leaves = d.leaves()
+    let leavesData = leaves.map((d) => d.data)
+    return {
+      leaves: leaves,
+      leavesData: leavesData,
+    }
+  });
 
   let activeId = "root";
   let selectedIds = ["root"];
@@ -72,10 +66,7 @@
     )
     .then((d) => [d]);
 
-  let modal3dViewOpen = false;
-  let modal3dViewItemId = "";
-
-  // History navigation //////////
+// History navigation //////////
 
   let hashData, breadcrumbData, hashSubStrings;
 
@@ -98,7 +89,6 @@
     let pathArray = hashData.path ? hashData.path.split("/").filter((d) => d != "") : [];
 
     activeId = pathArray[pathArray.length - 1];
-    console.log(pathArray[pathArray.length - 1])
 
     function newHash(hashData) {
       let values = Object.values(hashData);
@@ -123,7 +113,7 @@
 <main>
   <Theme bind:theme persist persistKey="__carbon-theme" />
 
-  <Header company="IBOIS —" platformName="Irregular Components Catalogue">
+  <Header company="EPFL IBOIS —" platformName="Catalogue Explorer">
     <HeaderUtilities>
       <HeaderGlobalAction
         aria-label="Theme switch"
@@ -134,17 +124,11 @@
   </Header>
 
   <Content>
-    <Grid>
-      <Row>
-        <Column>
-          <h1>Welcome</h1>
-        </Column>
-      </Row>
-    </Grid>
+    <Breadcrumb {breadcrumbData} />
   </Content>
-  <Grid padding>
+  <Grid padding fullWidth>
     <Row>
-      <Column sm={4} md={2} lg={4}>
+      <Column sm={4} md={2} lg={3}>
         {#await promDatabaseTreeview}
           <p>Loading ...</p>
         {:then database}
@@ -169,9 +153,8 @@
           />
         {/await}
       </Column>
-      <Column sm={0} md={6} lg={12}>
-          <Breadcrumb {breadcrumbData} />
-        <Cat_DataTable {promDatabaseLeaves} />
+      <Column sm={4} md={6} lg={13}>
+        <Cat_DataTable {promDatabaseLeaves} {activeId} />
       </Column>
     </Row>
   </Grid>
