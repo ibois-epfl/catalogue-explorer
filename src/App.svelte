@@ -151,13 +151,13 @@
                 left.
               </ListItem>
               <ListItem>
-                Further filtering is possible using the toolbar just below.
+                Further filtering is possible using the toolbar above the table.
                 Filtering works by text matching or by defining a maximum or
                 minimum value using the syntaxes '&lt;x' or '&gt;x'
                 respectively. You can restrict the filter to a specified column.
               </ListItem>
               <ListItem>
-                Clicking on the down arrow in front of a row opens 3D file
+                Clicking on the down arrow in front of a row shows
                 download options for the given object.
               </ListItem>
               <ListItem>
