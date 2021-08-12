@@ -19,8 +19,6 @@
     Row,
     Column,
     Dropdown,
-    UnorderedList,
-    ListItem,
   } from "carbon-components-svelte";
   import Save16 from "carbon-icons-svelte/lib/Save16";
 
@@ -104,7 +102,6 @@
   Loading ...
 {:then tableFormattedDatabase}
   <DataTable
-    title="DataTable View"
     sortable
     expandable
     batchSelection
@@ -144,29 +141,6 @@
     on:click:cell={cellClicked}
     on:mouseenter:row={(row) => (currentRow = row)}
   >
-    <div slot="description">
-      <UnorderedList nested>
-        <ListItem>
-          Clicking on a row opens a window with the object's 3d viewer
-        </ListItem>
-        <ListItem>
-          The table is sortable by clicking on column headers.
-        </ListItem>
-        <ListItem>
-          Its content can be filtered by navigating the tree on the left.
-        </ListItem>
-        <ListItem>
-          Further filtering is possible using the toolbar just below. Filtering
-          works by text matching or by defining a maximum or minimum value using
-          the syntaxes '&lt;x' or '&gt;x' respectively. You can restrict the
-          filter to a specified column.
-        </ListItem>
-        <ListItem>
-          Finally, selecting items allows you to batch download them as a
-          compressed folder.
-        </ListItem>
-      </UnorderedList>
-    </div>
     <Toolbar>
       <ToolbarBatchActions>
         <Button

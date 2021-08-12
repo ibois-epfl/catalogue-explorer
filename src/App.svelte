@@ -11,6 +11,10 @@
     Column,
     Theme,
     TreeView,
+    Accordion,
+    AccordionItem,
+    UnorderedList,
+    ListItem,
   } from "carbon-components-svelte";
 
   import ColorSwitch24 from "carbon-icons-svelte/lib/ColorSwitch24";
@@ -20,8 +24,10 @@
   import * as d3 from "d3";
   import Breadcrumb from "./Breadcrumb.svelte";
 
-  let theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "g90" : "g10";
-  console.log(window.matchMedia("(prefers-color-scheme: dark)"))
+  let theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "g90"
+    : "g10";
+  console.log(window.matchMedia("(prefers-color-scheme: dark)"));
   function switchTheme() {
     theme = theme == "g90" ? "g10" : "g90";
   }
@@ -36,13 +42,13 @@
         .parentId((d) => d.parent)(d)
     );
 
-  let promDatabaseLeaves = promDatabase.then((d) =>{
-    let leaves = d.leaves()
-    let leavesData = leaves.map((d) => d.data)
+  let promDatabaseLeaves = promDatabase.then((d) => {
+    let leaves = d.leaves();
+    let leavesData = leaves.map((d) => d.data);
     return {
       leaves: leaves,
       leavesData: leavesData,
-    }
+    };
   });
 
   let activeId = "root";
@@ -66,7 +72,7 @@
     )
     .then((d) => [d]);
 
-// History navigation //////////
+  // History navigation //////////
 
   let hashData, breadcrumbData, hashSubStrings;
 
@@ -83,10 +89,12 @@
     );
 
     if (hashData.path == undefined) {
-      hashData.path = "root"
+      hashData.path = "root";
     }
 
-    let pathArray = hashData.path ? hashData.path.split("/").filter((d) => d != "") : [];
+    let pathArray = hashData.path
+      ? hashData.path.split("/").filter((d) => d != "")
+      : [];
 
     activeId = pathArray[pathArray.length - 1];
 
@@ -129,6 +137,40 @@
   <Grid padding fullWidth>
     <Row>
       <Column sm={4} md={2} lg={3}>
+        <Accordion>
+          <AccordionItem title="How to ?">
+            <UnorderedList nested>
+              <ListItem>
+                Clicking on a row opens a window with the object's 3d viewer.
+              </ListItem>
+              <ListItem>
+                The table is sortable by clicking on column headers.
+              </ListItem>
+              <ListItem>
+                Table content can be filtered by navigating the tree on the
+                left.
+              </ListItem>
+              <ListItem>
+                Further filtering is possible using the toolbar just below.
+                Filtering works by text matching or by defining a maximum or
+                minimum value using the syntaxes '&lt;x' or '&gt;x'
+                respectively. You can restrict the filter to a specified column.
+              </ListItem>
+              <ListItem>
+                Clicking on the down arrow in front of a row opens 3D file
+                download options for the given object.
+              </ListItem>
+              <ListItem>
+                Download of 3D files is also available from the 3D Viewer page.
+              </ListItem>
+              <ListItem>
+                Selecting items in the table allows you to batch download them
+                as a compressed folder.
+              </ListItem>
+            </UnorderedList>
+          </AccordionItem>
+        </Accordion>
+        <br>
         {#await promDatabaseTreeview}
           <p>Loading ...</p>
         {:then database}
