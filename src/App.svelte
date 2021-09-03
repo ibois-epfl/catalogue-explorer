@@ -15,6 +15,8 @@
     AccordionItem,
     UnorderedList,
     ListItem,
+    ImageLoader,
+    Link,
   } from "carbon-components-svelte";
 
   import ColorSwitch24 from "carbon-icons-svelte/lib/ColorSwitch24";
@@ -142,6 +144,15 @@
             <UnorderedList nested>
               <ListItem>
                 Clicking on a row opens a window with the object's 3d viewer.
+              </ListItem>
+              <ListItem>
+                Go to layers tab to toggle on/off the different geometry types (point clouds, mesh, bounding box)
+                <Link
+                  href="3DViewerLayerOptions.PNG"
+                  target="_blank"
+                >
+                  <ImageLoader src="3DViewerLayerOptions.PNG" />
+                </Link>
               </ListItem>
               <ListItem>
                 The table is sortable by clicking on column headers.
