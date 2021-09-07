@@ -19,6 +19,8 @@
     Row,
     Column,
     Dropdown,
+    Select,
+    SelectItem,
   } from "carbon-components-svelte";
   import Save16 from "carbon-icons-svelte/lib/Save16";
 
@@ -58,7 +60,7 @@
   function downloadBatch(rows) {
     let filenames = selectedRowIds
       .map((id) => rows.filter((row) => row.id == id)[0])
-      .map((row) => row.item + "_PointCloud.3dm");
+      .map((row) => row.item + downloadTypes[downloadTypeIndex].id);
 
     let urls = filenames.map((filename) => "data/3dm/" + filename);
 
@@ -74,7 +76,7 @@
           [fflate.zipSync(Object.fromEntries(fileBuffers), { level: 0 })],
           { type: "application/zip" }
         ),
-        "point_cloud_selection.zip"
+        "Selection" + downloadTypes[downloadTypeIndex].id + ".zip"
       );
     });
   }
@@ -143,10 +145,17 @@
   >
     <Toolbar>
       <ToolbarBatchActions>
-        <Button
-          icon={Save16}
-          on:click={() => downloadBatch(tableFormattedDatabase.rows)}
-          >Download original point clouds (.zip)</Button
+        <Select
+          inline
+          labelText="Download options"
+          bind:selected={downloadTypeIndex}
+        >
+          {#each downloadTypes as {id, text}, i}
+            <SelectItem value={i} text={text} />
+          {/each}
+        </Select>
+        <Button on:click={() => downloadBatch(tableFormattedDatabase.rows)}
+          >Download selected (.zip)</Button
         >
       </ToolbarBatchActions>
       <ToolbarContent>
