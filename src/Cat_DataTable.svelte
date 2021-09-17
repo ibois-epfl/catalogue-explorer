@@ -24,8 +24,7 @@
   } from "carbon-components-svelte";
   import Save16 from "carbon-icons-svelte/lib/Save16";
 
-  import * as fflate from "fflate";
-  import { saveAs } from "file-saver";
+  import { batchConvertZipAndDownload, convertAndDownload } from "./batchConvertAndZip";
 
   let promTableFormattedDatabase = promDatabaseLeaves.then((leavesFull) => {
     let leaves = leavesFull.leaves;
@@ -58,45 +57,47 @@
   let selectedRowIds = [];
 
   function downloadBatch(rows) {
-    let filenames = selectedRowIds
+    let rhino3dmFilenames = selectedRowIds
       .map((id) => rows.filter((row) => row.id == id)[0])
-      .map((row) => row.item + downloadTypes[downloadTypeIndex].id);
+      .map((row) => {
+        let filename = row.item + downloadTypes[downloadTypeIndex].id
+        return filename.substring(0,filename.lastIndexOf(".")) + ".3dm"
+      });
 
-    let urls = filenames.map((filename) => "data/3dm/" + filename);
+    let urls = rhino3dmFilenames.map(filename => "data/3dm/" + filename);
 
-    let fileBuffersProm = urls.map((url, index) => {
-      return fetch(url)
-        .then((res) => res.arrayBuffer())
-        .then((fileBuffer) => [filenames[index], new Uint8Array(fileBuffer)]);
-    });
+    let format = downloadTypes[downloadTypeIndex].id
+    format = format.substring(format.lastIndexOf(".") + 1)
 
-    Promise.all(fileBuffersProm).then((fileBuffers) => {
-      saveAs(
-        new Blob(
-          [fflate.zipSync(Object.fromEntries(fileBuffers), { level: 0 })],
-          { type: "application/zip" }
-        ),
-        "Selection" + downloadTypes[downloadTypeIndex].id + ".zip"
-      );
-    });
+    batchConvertZipAndDownload(
+      urls,
+      format,
+      "Selection " + downloadTypes[downloadTypeIndex].text + ".zip",
+      0
+    )
   }
 
   let downloadTypeIndex = 0;
   let downloadTypes = [
-    { id: "_PointCloud.3dm", text: "Point cloud (original)" },
-    {
-      id: "_PointCloud_Downsampled.3dm",
-      text: "Point cloud (voxel downsampled)",
-    },
-    { id: "_MinBBox.3dm", text: "MVBB (Minimal Volume Bounding Box)" },
-    { id: "_Mesh.3dm", text: "Mesh (Poisson reconstruction)" },
+    { id: "_PointCloud.3dm", text: "3DM - Point cloud (original)" },
+    { id: "_PointCloud_Downsampled.3dm", text: "3DM - Point cloud (voxel downsampled)"  },
+    { id: "_MinBBox.3dm", text: "3DM - MVBB (Minimal Volume Bounding Box)" },
+    { id: "_Mesh.3dm", text: "3DM - Mesh (Poisson reconstruction)" },
+    { id: "_PointCloud.obj", text: "OBJ - Point cloud (original)" },
+    { id: "_PointCloud_Downsampled.obj", text: "OBJ - Point cloud (voxel downsampled)" },
+    { id: "_Mesh.obj", text: "OBJ - Mesh (Poisson reconstruction)" },
+    { id: "_Mesh.ply", text: "PLY - Mesh (Poisson reconstruction)" },
   ];
-
+  
   function download3dFile(id) {
-    saveAs(
-      "data/3dm/" + id + downloadTypes[downloadTypeIndex].id,
-      id + downloadTypes[downloadTypeIndex].id
-    );
+    let format = downloadTypes[downloadTypeIndex].id
+    format = format.substring(format.lastIndexOf(".") + 1)
+    let geometryType = downloadTypes[downloadTypeIndex].id
+    geometryType = geometryType.substring(0, geometryType.lastIndexOf("."))
+    convertAndDownload(
+      "data/3dm/" + id + geometryType + ".3dm",
+      format
+    )
   }
 </script>
 
