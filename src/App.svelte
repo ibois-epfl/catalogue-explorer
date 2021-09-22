@@ -1,3 +1,7 @@
+<!-- 
+@author: Aymeric Broyet
+@date: 20210921
+ -->
 <script>
   import "carbon-components-svelte/css/all.css";
 
@@ -16,7 +20,7 @@
     UnorderedList,
     ListItem,
     ImageLoader,
-    Link,
+    OutboundLink,
   } from "carbon-components-svelte";
 
   import ColorSwitch24 from "carbon-icons-svelte/lib/ColorSwitch24";
@@ -27,11 +31,11 @@
   import Breadcrumb from "./Breadcrumb.svelte";
 
   let theme = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "g90"
+    ? "g100"
     : "g10";
-  console.log(window.matchMedia("(prefers-color-scheme: dark)"));
+  // console.log(window.matchMedia("(prefers-color-scheme: dark)"));
   function switchTheme() {
-    theme = theme == "g90" ? "g10" : "g90";
+    theme = theme == "g100" ? "g10" : "g100";
   }
 
   let promDatabase = fetch("data/database.csv")
@@ -123,7 +127,7 @@
 <main>
   <Theme bind:theme persist persistKey="__carbon-theme" />
 
-  <Header company="EPFL IBOIS —" platformName="Catalogue Explorer">
+  <Header company="EPFL IBOIS" platformName="Catalogue Explorer">
     <HeaderUtilities>
       <HeaderGlobalAction
         aria-label="Theme switch"
@@ -139,49 +143,6 @@
   <Grid padding fullWidth>
     <Row>
       <Column sm={4} md={2} lg={3}>
-        <Accordion>
-          <AccordionItem title="How to ?">
-            <UnorderedList nested>
-              <ListItem>
-                Clicking on a row opens a window with the object's 3d viewer.
-              </ListItem>
-              <ListItem>
-                Go to layers tab to toggle on/off the different geometry types (point clouds, mesh, bounding box)
-                <Link
-                  href="3DViewerLayerOptions.PNG"
-                  target="_blank"
-                >
-                  <ImageLoader src="3DViewerLayerOptions.PNG" />
-                </Link>
-              </ListItem>
-              <ListItem>
-                The table is sortable by clicking on column headers.
-              </ListItem>
-              <ListItem>
-                Table content can be filtered by navigating the tree on the
-                left.
-              </ListItem>
-              <ListItem>
-                Further filtering is possible using the toolbar above the table.
-                Filtering works by text matching or by defining a maximum or
-                minimum value using the syntaxes '&lt;x' or '&gt;x'
-                respectively. You can restrict the filter to a specified column.
-              </ListItem>
-              <ListItem>
-                Clicking on the down arrow in front of a row shows
-                download options for the given object.
-              </ListItem>
-              <ListItem>
-                Download of 3D files is also available from the 3D Viewer page.
-              </ListItem>
-              <ListItem>
-                Selecting items in the table allows you to batch download them
-                as a compressed folder.
-              </ListItem>
-            </UnorderedList>
-          </AccordionItem>
-        </Accordion>
-        <br>
         {#await promDatabaseTreeview}
           <p>Loading ...</p>
         {:then database}
@@ -205,6 +166,74 @@
             }}
           />
         {/await}
+        <br />
+        <Accordion>
+          <AccordionItem title="Help">
+            <h5>Viewing 3d files</h5>
+            <UnorderedList nested>
+              <ListItem>
+                Clicking on a row opens a window with the object's 3d viewer.
+              </ListItem>
+              <ListItem>
+                Go to layers tab to toggle on/off the different geometry types
+                (point clouds, mesh, bounding box)
+                <OutboundLink href="3DViewerLayerOptions.PNG" target="_blank">
+                  <ImageLoader src="3DViewerLayerOptions.PNG" />
+                </OutboundLink>
+              </ListItem>
+            </UnorderedList>
+            <h5>Filtering objects</h5>
+            <UnorderedList nested>
+              <ListItem>
+                The table is sortable by clicking on column headers.
+              </ListItem>
+              <ListItem>
+                Table content can be filtered by navigating the tree on the
+                left.
+              </ListItem>
+              <ListItem>
+                Further filtering is possible using the toolbar above the table.
+                Filtering works by text matching or by defining a maximum or
+                minimum value using the syntaxes '&lt;x' or '&gt;x'
+                respectively. You can restrict the filter to a specified column.
+              </ListItem>
+            </UnorderedList>
+            <h5>Downloading 3d files</h5>
+            <UnorderedList nested>
+              <ListItem>
+                Clicking on the down arrow in front of a row shows download
+                options for the given object.
+              </ListItem>
+              <ListItem>
+                Download of 3D files is also available from the 3D Viewer page.
+              </ListItem>
+              <ListItem>
+                Selecting items in the table allows you to batch download them
+                as a compressed folder.
+              </ListItem>
+            </UnorderedList>
+          </AccordionItem>
+          <AccordionItem title="Credits">
+            Institute:
+            <br />
+            <OutboundLink href="https://www.epfl.ch/labs/ibois" target="_blank">
+              Laboratory for Timber Construction (IBOIS), Ecole Polytechnique
+              Federale de Lausanne (EPFL)
+            </OutboundLink>
+            <br />
+            Web app repository:
+            <OutboundLink
+              href="https://github.com/ibois-epfl/catalogue-explorer"
+            >
+              Catalogue Explorer on GitHub
+            </OutboundLink>
+            Author:
+            <br />
+            <OutboundLink href="https://github.com/AymericBr" target="_blank">
+              Aymeric Broyet
+            </OutboundLink>
+          </AccordionItem>
+        </Accordion>
       </Column>
       <Column sm={4} md={6} lg={13}>
         <Cat_DataTable {promDatabaseLeaves} {activeId} />

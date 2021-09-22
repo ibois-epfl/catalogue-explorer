@@ -10,19 +10,19 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
-    "carbon-components-svelte": "^0.42.2",
-    "d3": "^7.0.0",
+    "carbon-components-svelte": "^0.42.3",
+    "d3": "^7.0.3",
     "fflate": "^0.7.1",
     "file-saver": "^2.0.5",
-    "rollup": "^2.3.4",
+    "rollup": "^2.57.0",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.0",
-    "svelte": "^3.0.0",
+    "svelte": "^3.42.6",
     "three": "^0.132.2"
   },
   "dependencies": {
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.14"
   }
 }

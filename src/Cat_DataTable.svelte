@@ -1,3 +1,7 @@
+<!-- 
+@author: Aymeric Broyet
+@date: 20210921
+ -->
 <script>
   export let promDatabaseLeaves;
   export let activeId;
@@ -11,6 +15,7 @@
     ToolbarMenuItem,
     ToolbarBatchActions,
     Button,
+    Modal,
     ComposedModal,
     ModalHeader,
     ModalBody,
@@ -21,11 +26,19 @@
     Dropdown,
     Select,
     SelectItem,
+    ProgressBar,
   } from "carbon-components-svelte";
   import Save16 from "carbon-icons-svelte/lib/Save16";
 
-  import { batchConvertZipAndDownload, convertAndDownload } from "./batchConvertAndZip";
+  import {
+    batchConvertZipAndDownload,
+    convertAndDownload,
+  } from "./batchConvertAndZip";
 
+  /**
+   * A promise fullfilled in an object formatted and supplied to the DataTable component.
+   * @type {Promise<Object>}
+   */
   let promTableFormattedDatabase = promDatabaseLeaves.then((leavesFull) => {
     let leaves = leavesFull.leaves;
     let d = leavesFull.leavesData;
@@ -41,10 +54,17 @@
     return out;
   });
 
+/**
+ * Indice of the clicked row for 3dViewer modal opening
+ * @type {number}
+ */
   let currentRow;
 
+  /**
+   * Sets the modal open variable to true. Sets the modal item ID to corresponding clicked row object ID.
+   * @returns {void}
+   */
   function cellClicked() {
-    console.log(currentRow);
     modal3dViewItemId = currentRow.detail.item;
     modal3dViewOpen = true;
   }
@@ -56,48 +76,96 @@
 
   let selectedRowIds = [];
 
+  let loadingOverlayOpen = false;
+
+  let loadingProgress = 0;
+  let loadingFilename;
+
+  document.addEventListener("fileSaveTriggered", (event) => {
+    loadingProgress = loadingProgress + event.detail.increment;
+    loadingFilename = event.detail.filename;
+    if (100 - loadingProgress < Number.EPSILON) {
+      // Number.EPSILON Prevent floating point number operations errors.
+      loadingFilename = "Finished";
+    }
+  });
+
   function downloadBatch(rows) {
+    loadingOverlayOpen = true;
     let rhino3dmFilenames = selectedRowIds
       .map((id) => rows.filter((row) => row.id == id)[0])
       .map((row) => {
-        let filename = row.item + downloadTypes[downloadTypeIndex].id
-        return filename.substring(0,filename.lastIndexOf(".")) + ".3dm"
+        let filename = row.item + downloadTypes[downloadTypeIndex].id;
+        return filename.substring(0, filename.lastIndexOf(".")) + ".3dm";
       });
 
-    let urls = rhino3dmFilenames.map(filename => "data/3dm/" + filename);
+    let urls = rhino3dmFilenames.map((filename) => "data/3dm/" + filename);
 
-    let format = downloadTypes[downloadTypeIndex].id
-    format = format.substring(format.lastIndexOf(".") + 1)
+    let format = downloadTypes[downloadTypeIndex].id;
+    format = format.substring(format.lastIndexOf(".") + 1);
 
     batchConvertZipAndDownload(
       urls,
       format,
       "Selection " + downloadTypes[downloadTypeIndex].text + ".zip",
       0
-    )
+    );
   }
 
   let downloadTypeIndex = 0;
   let downloadTypes = [
-    { id: "_PointCloud.3dm", text: "3DM - Point cloud (original)" },
-    { id: "_PointCloud_Downsampled.3dm", text: "3DM - Point cloud (voxel downsampled)"  },
-    { id: "_MinBBox.3dm", text: "3DM - MVBB (Minimal Volume Bounding Box)" },
-    { id: "_Mesh.3dm", text: "3DM - Mesh (Poisson reconstruction)" },
-    { id: "_PointCloud.obj", text: "OBJ - Point cloud (original)" },
-    { id: "_PointCloud_Downsampled.obj", text: "OBJ - Point cloud (voxel downsampled)" },
-    { id: "_Mesh.obj", text: "OBJ - Mesh (Poisson reconstruction)" },
-    { id: "_Mesh.ply", text: "PLY - Mesh (Poisson reconstruction)" },
+    {
+      id: "_PointCloud.3dm",
+      text: "3DM - Point cloud (original)",
+    },
+    {
+      id: "_PointCloud_Downsampled.3dm",
+      text: "3DM - Point cloud (voxel downsampled)",
+    },
+    {
+      id: "_MinBBox.3dm",
+      text: "3DM - MVBB (Minimal Volume Bounding Box)",
+    },
+    {
+      id: "_Mesh.3dm",
+      text: "3DM - Mesh (Poisson reconstruction)",
+    },
+    {
+      id: "_PointCloud.obj",
+      text: "OBJ - Point cloud (original)",
+    },
+    {
+      id: "_PointCloud_Downsampled.obj",
+      text: "OBJ - Point cloud (voxel downsampled)",
+    },
+    {
+      id: "_Mesh.obj",
+      text: "OBJ - Mesh (Poisson reconstruction)",
+    },
+    {
+      id: "_Mesh.ply",
+      text: "PLY - Mesh (Poisson reconstruction)",
+    },
+    {
+      id: "_PointCloud.gltf",
+      text: "glTF - Point cloud (original)",
+    },
+    {
+      id: "_PointCloud_Downsampled.gltf",
+      text: "glTF - Point cloud (voxel downsampled)",
+    },
+    {
+      id: "_Mesh.gltf",
+      text: "glTF - Mesh (Poisson reconstruction)",
+    },
   ];
-  
+
   function download3dFile(id) {
-    let format = downloadTypes[downloadTypeIndex].id
-    format = format.substring(format.lastIndexOf(".") + 1)
-    let geometryType = downloadTypes[downloadTypeIndex].id
-    geometryType = geometryType.substring(0, geometryType.lastIndexOf("."))
-    convertAndDownload(
-      "data/3dm/" + id + geometryType + ".3dm",
-      format
-    )
+    let format = downloadTypes[downloadTypeIndex].id;
+    format = format.substring(format.lastIndexOf(".") + 1);
+    let geometryType = downloadTypes[downloadTypeIndex].id;
+    geometryType = geometryType.substring(0, geometryType.lastIndexOf("."));
+    convertAndDownload("data/3dm/" + id + geometryType + ".3dm", format);
   }
 </script>
 
@@ -151,8 +219,8 @@
           labelText="Download options"
           bind:selected={downloadTypeIndex}
         >
-          {#each downloadTypes as {id, text}, i}
-            <SelectItem value={i} text={text} />
+          {#each downloadTypes as { id, text }, i}
+            <SelectItem value={i} {text} />
           {/each}
         </Select>
         <Button on:click={() => downloadBatch(tableFormattedDatabase.rows)}
@@ -224,6 +292,19 @@
     </ModalFooter>
   </ComposedModal>
 {/await}
+
+<Modal
+  bind:open={loadingOverlayOpen}
+  modalHeading="Files download and conversion"
+  passiveModal
+  on:close={() => (loadingProgress = 0)}
+>
+  <ProgressBar
+    value={loadingProgress}
+    labelText={loadingFilename}
+    helperText={Number.parseFloat(loadingProgress).toFixed(2) + " %"}
+  />
+</Modal>
 
 <style>
   :global(.bx--parent-row) {

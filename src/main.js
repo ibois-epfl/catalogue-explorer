@@ -1,3 +1,6 @@
+// @author: Aymeric Broyet
+// @date: 20210921
+
 import App from './App.svelte';
 
 const app = new App({

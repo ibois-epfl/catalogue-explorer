@@ -1,4 +1,8 @@
-<script>
+<!-- 
+@author: Aymeric Broyet
+@date: 20210921
+ -->
+ <script>
   // "#view=DataTable&path=/coucou/42/salopetteJaune"
   // {path: "/coucou/42/", view: "DataTable"}
 
